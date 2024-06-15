@@ -1,11 +1,11 @@
-*/node_modules
-*package-lock.json
+node_modules
+package-lock.json
 
-*.DS_Store
-*.env
+.DS_Store
+.env
 
 *.pyc
 __pycache__
 db.sqlite3
-/media
-/venv
+media
+venv
