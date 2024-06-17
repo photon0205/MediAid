@@ -1,39 +1,82 @@
 .chatbot-container {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    height: 80vh;
-  }
-  
-  .chatbot-messages {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 20px;
-  }
-  
-  .message {
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    display: inline-block;
-    max-width: 80%;
-  }
-  
-  .user-message {
-    background-color: #DCF8C6;
-    align-self: flex-end;
-  }
-  
-  .bot-message {
-    background-color: #FFF;
-    align-self: flex-start;
-  }
-  
-  .chatbot-input {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+.chatbot-messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 10px;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 20px;
+  display: inline-block;
+  max-width: 80%;
+  word-wrap: break-word;
+  font-size: 14px;
+}
+
+.user-message {
+  background-color: #dcf8c6;
+  align-self: flex-end;
+  border: 1px solid #c2e0c6;
+}
+
+.bot-message {
+  background-color: #fff;
+  align-self: flex-start;
+  border: 1px solid #e0e0e0;
+}
+
+.chatbot-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+}
+
+.chatbot-input .MuiAutocomplete-root {
+  flex: 1;
+}
+
+.chatbot-input .MuiButton-root {
+  height: 56px;
+}
+
+.chatbot-input .MuiTextField-root {
+  flex: 1;
+}
+
+.chatbot-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.chatbot-container .MuiTypography-root {
+  text-align: center;
+}

@@ -1,28 +1,48 @@
-import React, { useState } from 'react';
-import { TextField, Button, Paper, Typography, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Paper, Typography, Box, Autocomplete } from '@mui/material';
 import './Chatbot.css';
+import { fetchSymptoms, sendDiagnosisRequest } from '../basicAxios';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [symptoms, setSymptoms] = useState([]);
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+
+  useEffect(() => {
+    const initialMessage = { text: "Are you having any symptoms? Let me help you out.", user: false };
+    setMessages([initialMessage]);
+    fetchAllSymptoms();
+  }, []);
+
+  const fetchAllSymptoms = async () => {
+    try {
+      const data = await fetchSymptoms();
+      setSymptoms(data);
+    } catch (error) {
+      console.error("Error fetching symptoms:", error);
+    }
+  };
 
   const sendMessage = async () => {
-    if (input.trim() === '') return;
+    if (selectedSymptoms.length === 0) return;
 
-    const newMessage = { text: input, user: true };
+    const newMessage = { text: `Symptoms: ${selectedSymptoms.join(', ')}`, user: true };
     setMessages([...messages, newMessage]);
 
-    const response = await fetch('/api/diagnose/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ symptoms: input }),
-    });
+    try {
+      const data = await sendDiagnosisRequest(selectedSymptoms);
+      setMessages([...messages, newMessage, { text: data.diagnosis, user: false }]);
+    } catch (error) {
+      console.error("Error diagnosing symptoms:", error);
+    }
 
-    const data = await response.json();
-    setMessages([...messages, newMessage, { text: data.diagnosis, user: false }]);
     setInput('');
+    setSelectedSymptoms([]);
+  };
+
+  const handleSymptomChange = (event, value) => {
+    setSelectedSymptoms(value);
   };
 
   return (
@@ -41,12 +61,21 @@ const Chatbot = () => {
         ))}
       </Box>
       <Box className="chatbot-input">
-        <TextField
-          variant="outlined"
-          fullWidth
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+        <Autocomplete
+          multiple
+          options={symptoms}
+          getOptionLabel={(option) => option}
+          value={selectedSymptoms}
+          onChange={handleSymptomChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Enter symptoms"
+              placeholder="Type a symptom"
+              fullWidth
+            />
+          )}
         />
         <Button variant="contained" color="primary" onClick={sendMessage}>
           Send
