@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Paper, Typography, Box, Autocomplete } from '@mui/material';
 import './Chatbot.css';
-import { fetchSymptoms, sendDiagnosisRequest } from '../basicAxios';
+import { sendDiagnosisRequest, fetchSymptoms } from '../basicAxios';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -31,8 +31,15 @@ const Chatbot = () => {
     setMessages([...messages, newMessage]);
 
     try {
-      const data = await sendDiagnosisRequest(selectedSymptoms);
-      setMessages([...messages, newMessage, { text: data.diagnosis, user: false }]);
+      const response = await sendDiagnosisRequest(selectedSymptoms);
+      const { disease, probability, advice } = response.data;
+
+      setMessages([
+        ...messages,
+        newMessage,
+        { text: `Diagnosis: ${disease} (Probability: ${probability.toFixed(2)}%)`, user: false },
+        { text: `Advice: ${advice}`, user: false }
+      ]);
     } catch (error) {
       console.error("Error diagnosing symptoms:", error);
     }
