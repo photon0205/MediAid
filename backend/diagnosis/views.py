@@ -69,3 +69,25 @@ class DiagnoseView(APIView):
         except Exception as e:
             print(f"Error while querying OpenAI: {e}")
             return "Sorry, I'm unable to process your request right now."
+        
+class OpenAIView(APIView):
+    def post(self, request):
+        try:
+            question = request.data.get('question', '')
+            gpt3_response = self.ask_openai(question)
+            return Response({'answer': gpt3_response}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error processing request: {e}")
+            return Response({'error': 'Error processing request'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def ask_openai(self, question):
+        try:
+            response = openai.Completion.create(
+                engine="davinci",
+                prompt=question,
+                max_tokens=150
+            )
+            return response.choices[0].text.strip()
+        except Exception as e:
+            print(f"Error while querying OpenAI: {e}")
+            return "Sorry, I'm unable to process your request right now."
