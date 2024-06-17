@@ -1,13 +1,31 @@
+import os
+import pickle
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .serializers import SymptomSerializer
 
-class DiagnoseAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        symptoms = request.data.get('symptoms', '')
-        diagnosis = self.get_diagnosis(symptoms)
-        return Response({'diagnosis': diagnosis}, status=status.HTTP_200_OK)
+current_dir = os.path.dirname(__file__)
 
-    def get_diagnosis(self, symptoms):
-        # Placeholder for the actual diagnosis logic
-        return "Diagnosis based on symptoms: " + symptoms
+MODEL_PATH = os.path.join(current_dir, '../../ml_model/model.pkl')
+
+class DiagnoseView(APIView):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with open(MODEL_PATH, 'rb') as model_file:
+            self.model = pickle.load(model_file)
+
+    def post(self, request):
+        serializer = SymptomSerializer(data=request.data)
+        if serializer.is_valid():
+            symptoms = serializer.validated_data['symptoms']
+            predictions, probabilities = self.model.predict_proba([symptoms]), self.model.classes_
+            max_prob_idx = predictions.argmax(axis=1)
+            disease = probabilities[max_prob_idx]
+            probability = predictions[0][max_prob_idx] * 100
+            return Response({
+                'disease': disease[0],
+                'probability': probability[0]
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
